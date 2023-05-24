@@ -1,0 +1,48 @@
+name: Dataset fetching & preprocessing
+on: [workflow_dispatch]
+jobs:
+  dataset-fetch-normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install kaggle API
+        run: pip install kaggle
+      - name: download dataset
+        env:
+          KAGGLE_USERNAME: ${{secrets.KAGGLE_USERNAME}}
+          KAGGLE_KEY: ${{secrets.KAGGLE_KEY}}
+        run: kaggle datasets download blackmoon/russian-language-toxic-comments
+      - name: unpack dataset
+        run: unzip russian-language-toxic-comments.zip -d data/raw-source/
+      - name: install requirements
+        run: pip install --no-cache-dir -r deps/data-preprocessing.requirements.txt
+      - name: load and normalize data
+        run: python3.10 src/dataset_preprocessing.py "labeled.csv" "russian-language-toxic-comments-normalized.csv"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: data-storage
+          path: data/data-storage/
+
+  dataset-tokenize:
+    runs-on: ubuntu-latest
+    needs: dataset-fetch-normalize
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install requirements
+        run: pip install --no-cache-dir -r deps/tokenization.requirements.txt
+      - uses: actions/download-artifact@v3
+        with:
+          name: data-storage
+          path: data/data-storage/
+      - name: tokenize data
+        run: python3.10 src/dataset_tokenization.py "russian-language-toxic-comments-normalized.csv" "tokens.npz"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: feature-storage
+          path: data/feature-storage/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: tokenizer-storage
+          path: tokenizer/
