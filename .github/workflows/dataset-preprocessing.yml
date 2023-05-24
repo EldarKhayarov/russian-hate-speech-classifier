@@ -14,7 +14,7 @@ jobs:
           KAGGLE_KEY: ${{secrets.KAGGLE_KEY}}
         run: kaggle datasets download blackmoon/russian-language-toxic-comments
       - name: unpack dataset
-        run: mkdir data && mkdir data/raw-source unzip russian-language-toxic-comments.zip -d data/raw-source/
+        run: mkdir data && mkdir data/raw-source && unzip russian-language-toxic-comments.zip -d data/raw-source/
       - name: install requirements
         run: pip install --no-cache-dir -r deps/data-preprocessing.requirements.txt
       - name: load and normalize data
