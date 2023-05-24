@@ -39,3 +39,6 @@
 
 ![workflow.png](readme/imgs/diagrams/workflow.png)
 Диаграмма компонентов процесса работы системы (Рис. 2)
+
+![components.png](readme/imgs/diagrams/components.png)
+Диаграмма компонентов системы (Рис. 3)
