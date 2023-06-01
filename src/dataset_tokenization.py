@@ -17,7 +17,7 @@ from nltk.corpus import stopwords
 DATA_DIR = "data/"
 DATA_STORAGE = os.path.join(DATA_DIR, "data-storage")
 FEATURE_STORAGE = os.path.join(DATA_DIR, "feature-storage")
-TOKENIZER_DIRECTORY = "tokenizer/"
+TOKENIZER_DIRECTORY = "factorizer/"
 
 
 def load_data_from_file(filename: str) -> pd.DataFrame:
@@ -35,7 +35,7 @@ def write_data_to_target_file(
 
     target_path = os.path.join(FEATURE_STORAGE, target_filename)
     with open(target_path, "wb") as f:
-        sparse.save_npz(f, features)
+        sparse.save_npz(f, features, compressed=False)
 
 
 def save_tokenizer(tokenizer: Any) -> None:

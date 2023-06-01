@@ -44,5 +44,5 @@ jobs:
           path: data/feature-storage/
       - uses: actions/upload-artifact@v3
         with:
-          name: tokenizer-storage
-          path: tokenizer/
+          name: factorizer-storage
+          path: factorizer/
