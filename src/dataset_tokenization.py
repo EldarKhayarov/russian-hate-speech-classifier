@@ -17,7 +17,7 @@ from nltk.corpus import stopwords
 DATA_DIR = "data/"
 DATA_STORAGE = os.path.join(DATA_DIR, "data-storage")
 FEATURE_STORAGE = os.path.join(DATA_DIR, "feature-storage")
-TOKENIZER_DIRECTORY = "tokenizer/"
+TOKENIZER_DIRECTORY = "factorizer/"
 
 
 def load_data_from_file(filename: str) -> pd.DataFrame:
