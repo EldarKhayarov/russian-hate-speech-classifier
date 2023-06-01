@@ -160,4 +160,4 @@ cython_debug/
 
 # data dirs
 data/*
-tokenizer/*
+factorizer/*

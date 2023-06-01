@@ -1,48 +1,154 @@
-name: Dataset fetching & preprocessing
+name: Model training & evaluation
 on: [workflow_dispatch]
 jobs:
-  dataset-fetch-normalize:
+  train-model-svc:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo content
         uses: actions/checkout@v3
-      - name: install kaggle API
-        run: pip install kaggle
-      - name: download dataset
-        env:
-          KAGGLE_USERNAME: ${{secrets.KAGGLE_USERNAME}}
-          KAGGLE_KEY: ${{secrets.KAGGLE_KEY}}
-        run: kaggle datasets download blackmoon/russian-language-toxic-comments
-      - name: unpack dataset
-        run: mkdir data && mkdir data/raw-source && unzip russian-language-toxic-comments.zip -d data/raw-source/
       - name: install requirements
-        run: pip install --no-cache-dir -r deps/data-preprocessing.requirements.txt
-      - name: load and normalize data
-        run: python3.10 src/dataset_preprocessing.py "labeled.csv" "russian-language-toxic-comments-normalized.csv"
-      - uses: actions/upload-artifact@v3
-        with:
-          name: data-storage
-          path: data/data-storage/
-
-  dataset-tokenize:
-    runs-on: ubuntu-latest
-    needs: dataset-fetch-normalize
-    steps:
-      - name: checkout repo content
-        uses: actions/checkout@v3
-      - name: install requirements
-        run: pip install --no-cache-dir -r deps/tokenization.requirements.txt
+        run: pip install --no-cache-dir -r deps/model-training.requirements.txt
       - uses: actions/download-artifact@v3
         with:
           name: data-storage
           path: data/data-storage/
-      - name: tokenize data
-        run: python3.10 src/dataset_tokenization.py "russian-language-toxic-comments-normalized.csv" "tokens.npz"
-      - uses: actions/upload-artifact@v3
+      - uses: actions/download-artifact@v3
         with:
           name: feature-storage
           path: data/feature-storage/
+      - name: train model
+        run: python3.10 src/model_training.py "russian-language-toxic-comments-normalized.csv" "tokens.npz" "svc"
       - uses: actions/upload-artifact@v3
         with:
-          name: tokenizer-storage
-          path: tokenizer/
+          name: train-storage-svc
+          path: data/train-storage/svc/
+
+  train-model-logistic-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install requirements
+        run: pip install --no-cache-dir -r deps/model-training.requirements.txt
+      - uses: actions/download-artifact@v3
+        with:
+          name: data-storage
+          path: data/data-storage/
+      - uses: actions/download-artifact@v3
+        with:
+          name: feature-storage
+          path: data/feature-storage/
+      - name: train model
+        run: python3.10 src/model_training.py "russian-language-toxic-comments-normalized.csv" "tokens.npz" "logistic_regression"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: train-storage-logistic-regression
+          path: data/train-storage/logistic-regression/
+
+  train-model-decision-tree:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install requirements
+        run: pip install --no-cache-dir -r deps/model-training.requirements.txt
+      - uses: actions/download-artifact@v3
+        with:
+          name: data-storage
+          path: data/data-storage/
+      - uses: actions/download-artifact@v3
+        with:
+          name: feature-storage
+          path: data/feature-storage/
+      - name: train model
+        run: python3.10 src/model_training.py "russian-language-toxic-comments-normalized.csv" "tokens.npz" "decision_tree"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: train-storage-decision-tree
+          path: data/train-storage/decision-tree/
+
+  train-model-random-forest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install requirements
+        run: pip install --no-cache-dir -r deps/model-training.requirements.txt
+      - uses: actions/download-artifact@v3
+        with:
+          name: data-storage
+          path: data/data-storage/
+      - uses: actions/download-artifact@v3
+        with:
+          name: feature-storage
+          path: data/feature-storage/
+      - name: train model
+        run: python3.10 src/model_training.py "russian-language-toxic-comments-normalized.csv" "tokens.npz" "random_forest"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: train-storage-random-forest
+          path: data/train-storage/random-forest/
+
+  train-model-xgboost:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install requirements
+        run: pip install --no-cache-dir -r deps/model-training.requirements.txt
+      - uses: actions/download-artifact@v3
+        with:
+          name: data-storage
+          path: data/data-storage/
+      - uses: actions/download-artifact@v3
+        with:
+          name: feature-storage
+          path: data/feature-storage/
+      - name: train model
+        run: python3.10 src/model_training.py "russian-language-toxic-comments-normalized.csv"  "tokens.npz" "xgboost"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: train-storage-xgboost
+          path: data/train-storage/xgboost/
+
+  evaluation-models:
+    runs-on: ubuntu-latest
+    needs: [train-model-svc, train-model-logistic-regression, train-model-decision-tree, train-model-random-forest, train-model-xgboost]
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install requirements
+        run: pip install --no-cache-dir -r deps/models-evaluation.requirements.txt
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: data-storage
+          path: data/data-storage/
+      - uses: actions/download-artifact@v3
+        with:
+          name: train-storage-svc
+          path: data/train-storage/svc/
+      - uses: actions/download-artifact@v3
+        with:
+          name: train-storage-logistic-regression
+          path: data/train-storage/logistic-regression/
+      - uses: actions/download-artifact@v3
+        with:
+          name: train-storage-decision-tree
+          path: data/train-storage/decision-tree/
+      - uses: actions/download-artifact@v3
+        with:
+          name: train-storage-random-forest
+          path: data/train-storage/random-forest/
+      - uses: actions/download-artifact@v3
+        with:
+          name: train-storage-xgboost
+          path: data/train-storage/xgboost/
+
+      - name: evaluation
+        run: python3.10 src/models_evaluation.py "russian-language-toxic-comments-normalized.csv"
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: evaluation-storage
+          path: data/evaluation-storage/

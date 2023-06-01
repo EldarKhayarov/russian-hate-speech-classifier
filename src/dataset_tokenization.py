@@ -35,7 +35,7 @@ def write_data_to_target_file(
 
     target_path = os.path.join(FEATURE_STORAGE, target_filename)
     with open(target_path, "wb") as f:
-        sparse.save_npz(f, features)
+        sparse.save_npz(f, features, compressed=False)
 
 
 def save_tokenizer(tokenizer: Any) -> None:
