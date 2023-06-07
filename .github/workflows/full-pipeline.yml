@@ -245,9 +245,6 @@ jobs:
 
       - name: testing
         run: pytest src/api_testing.py
-        env:
-          PROJECT_ROOT_DIR: ${{PWD}}
-
 
   deploy-model:
     runs-on: ubuntu-latest
