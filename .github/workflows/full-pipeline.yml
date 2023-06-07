@@ -293,6 +293,6 @@ jobs:
       - name: Retying if failed
         uses: nick-fields/retry@v2
         with:
-        max_attempts: 3
-        retry_on: error
-        timeout_seconds: 5
+          max_attempts: 3
+          retry_on: error
+          timeout_seconds: 5
