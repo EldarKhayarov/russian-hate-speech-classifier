@@ -10,8 +10,8 @@ jobs:
         run: pip install kaggle
       - name: download dataset
         env:
-          KAGGLE_USERNAME: ${{secrets.KAGGLE_USERNAME}}
-          KAGGLE_KEY: ${{secrets.KAGGLE_KEY}}
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: kaggle datasets download blackmoon/russian-language-toxic-comments
       - name: unpack dataset
         run: mkdir data && mkdir data/raw-source && unzip russian-language-toxic-comments.zip -d data/raw-source/
@@ -286,4 +286,6 @@ jobs:
           path: data/train-storage/xgboost/
 
       - name: uploading factorizer & best model to the server
-        run: python3.10 src/model_deploying.py ${{variables.API_URL}}
+        run: python3.10 src/model_deploying.py $API_URL
+        env:
+          API_URL: ${{ vars.API_URL }}
