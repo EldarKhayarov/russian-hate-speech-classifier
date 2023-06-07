@@ -289,3 +289,10 @@ jobs:
         run: python3.10 src/model_deploying.py $API_URL
         env:
           API_URL: ${{ vars.API_URL }}
+
+      - name: Retying if failed
+        uses: nick-fields/retry@v2
+        with:
+        max_attempts: 3
+        retry_on: error
+        timeout_seconds: 5
