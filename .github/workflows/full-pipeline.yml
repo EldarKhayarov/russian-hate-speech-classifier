@@ -286,4 +286,4 @@ jobs:
           path: data/train-storage/xgboost/
 
       - name: uploading factorizer & best model to the server
-        run: python3.10 src/model_deploying.py ${{secrets.API_URL}}
+        run: python3.10 src/model_deploying.py ${{variables.API_URL}}
