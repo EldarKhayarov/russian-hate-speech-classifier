@@ -78,12 +78,13 @@ def save_predictions(path: str, predictions: np.array) -> None:
 def train_model_pipeline(
     data_filename: str, features_filename: str, model_name: str
 ) -> None:
-    features = load_features(features_filename)
-    marked_data = load_data_from_file(data_filename)
-    target_values = marked_data["toxic"]
-    trained_model = train_model(model_name, features, target_values)
+    train_features = load_features("train__" + features_filename)
+    test_features = load_features("test__" + features_filename)
+    train_marked_data = load_data_from_file("train__" + data_filename)
+    target_values = train_marked_data["toxic"]
+    trained_model = train_model(model_name, train_features, target_values)
 
-    y_predicted = trained_model.predict(features)
+    y_predicted = trained_model.predict(test_features)
 
     train_directory_path = os.path.join(TRAIN_STORAGE, camel_to_kebab(model_name))
     save_model(os.path.join(train_directory_path, "model.pickle"), trained_model)
