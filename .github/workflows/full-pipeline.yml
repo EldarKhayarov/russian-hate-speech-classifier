@@ -1,4 +1,4 @@
-name: Dataset fetching & preprocessing
+name: Full Pipeline
 on: [workflow_dispatch]
 jobs:
   dataset-fetch-normalize:
