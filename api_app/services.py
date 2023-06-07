@@ -2,7 +2,10 @@ import re
 
 import nltk
 
-nltk.download("stopwords")
+try:
+    nltk.download("stopwords")
+except FileExistsError:
+    pass
 
 from nltk.corpus import stopwords
 from pymorphy2 import MorphAnalyzer

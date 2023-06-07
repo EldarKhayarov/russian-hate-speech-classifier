@@ -247,7 +247,7 @@ jobs:
         run: pytest src/api_testing.py
 
   deploy-model:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: unit-test-api
     steps:
       - name: checkout repo content
