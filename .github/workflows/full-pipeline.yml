@@ -290,9 +290,16 @@ jobs:
         env:
           API_URL: ${{ vars.API_URL }}
 
-      - name: Retying if failed
-        uses: nick-fields/retry@v2
-        with:
-          max_attempts: 3
-          retry_on: error
-          timeout_seconds: 5
+  test-deployed-model:
+    runs-on: ubuntu-latest
+    needs: deploy-model
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install requirements
+        run: pip install --no-cache-dir -r deps/deployed-model-testing.requirements.txt
+
+      - name: testing deployed model
+        run: pytest src/deployed_model_testing.py
+        env:
+          API_URL: ${{ vars.API_URL }}
