@@ -50,6 +50,7 @@ def upload_model_coro(client: AsyncClient):
 
 
 async def deploy_model(api_address: str):
+    logger.info("Connecting to server " + api_address)
     async with AsyncClient(base_url=api_address) as client:
         rsp_factorizer, rsp_model = await asyncio.gather(
             upload_factorizer_coro(client),
