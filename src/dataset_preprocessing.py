@@ -1,6 +1,7 @@
 import sys
 import os
 
+from sklearn.model_selection import train_test_split
 import pandas as pd
 import nltk
 
@@ -54,15 +55,22 @@ def write_data_to_target_file(target_filename: str, data: pd.DataFrame) -> None:
     data.to_csv(target_path, index=False)
 
 
-def normalize_data_pipeline(filename: str, target_filename: str) -> None:
+def normalize_data_pipeline(
+    filename: str,
+    target_filename: str,
+    fraction: float = 1,
+) -> None:
     df = load_data_from_file(filename)
     X = clear_phrases(df["comment"])
     X = X.str.lower()
     X = X.apply(normalize_phrase_fab())
     df["comment"] = X
     df.dropna(inplace=True)
-    write_data_to_target_file(target_filename, df)
+    df = df.sample(frac=fraction)
+    df_train, df_test = train_test_split(df, train_size=0.7, random_state=777)
+    write_data_to_target_file("train__" + target_filename, df_train)
+    write_data_to_target_file("test__" + target_filename, df_test)
 
 
 if __name__ == "__main__":
-    normalize_data_pipeline(sys.argv[1], sys.argv[2])
+    normalize_data_pipeline(sys.argv[1], sys.argv[2], 0.75)

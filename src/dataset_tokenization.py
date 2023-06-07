@@ -26,7 +26,7 @@ def load_data_from_file(filename: str) -> pd.DataFrame:
 
 
 def write_data_to_target_file(
-    target_filename: str, features: sparse.csr_matrix, target: pd.Series
+    target_filename: str, features: sparse.csr_matrix
 ) -> None:
     try:
         os.makedirs(FEATURE_STORAGE)
@@ -50,7 +50,8 @@ def save_tokenizer(tokenizer: Any) -> None:
 
 
 def normalize_data_pipeline(filename: str, target_filename: str) -> None:
-    df = load_data_from_file(filename).fillna("")
+    df_train = load_data_from_file("train__" + filename).fillna("")
+    df_test = load_data_from_file("test__" + filename).fillna("")
     stopwords_list = stopwords.words("russian")
     tf_idf_vectorizer = TfidfVectorizer(
         sublinear_tf=True,
@@ -60,9 +61,14 @@ def normalize_data_pipeline(filename: str, target_filename: str) -> None:
         ngram_range=(2, 12),
         max_features=10000,
     )
-    features = tf_idf_vectorizer.fit_transform(df["comment"])
+    tf_idf_vectorizer.fit(df_train["comment"].append(df_test["comment"]))
 
-    write_data_to_target_file(target_filename, features, df["toxic"])
+    features_train = tf_idf_vectorizer.transform(df_train["comment"])
+    features_test = tf_idf_vectorizer.transform(df_test["comment"])
+
+    write_data_to_target_file("train__" + target_filename, features_train)
+    write_data_to_target_file("test__" + target_filename, features_test)
+
     save_tokenizer(tf_idf_vectorizer)
 
 
