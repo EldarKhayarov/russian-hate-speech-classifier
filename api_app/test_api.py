@@ -1,4 +1,5 @@
-import os.path
+import os
+from pathlib import Path
 
 import pytest
 from fastapi import status
@@ -10,9 +11,9 @@ from api_app.app import get_application
 HOST = "localhost"
 PORT = "8000"
 
-ROOT_DIR = os.environ.get("PROJECT_ROOT_DIR", "..")
-FACTORIZER_PATH = os.path.join(ROOT_DIR, "factorizer/tfidf_vectorizer.pickle")
-MODEL_PATH = os.path.join(ROOT_DIR, "data/train-storage/svc/best__model.pickle")
+PROJECT_ROOT_DIR = os.fspath(Path(__file__).parent.parent.absolute())
+FACTORIZER_PATH = os.path.join(PROJECT_ROOT_DIR, "factorizer/tfidf_vectorizer.pickle")
+MODEL_PATH = os.path.join(PROJECT_ROOT_DIR, "data/train-storage/svc/best__model.pickle")
 
 
 @pytest.fixture(scope="session")
